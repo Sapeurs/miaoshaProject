@@ -183,17 +183,14 @@ public class OrderController extends BaseController{
 
         //同步调用线程池的submit方法
         //拥塞窗口为20的等待队列，用来队列化泄洪
-        Future<Object> future = executorService.submit(new Callable<Object>() {
-            @Override
-            public Object call() throws Exception {
-                //加入库存流水init状态
-                String stockLogId = itemService.initStockLog(itemId, amount);
-                //再去完成对应的下单事务型消息机制
-                if (!mqProducer.transactionAsyncReduceStock(userModel.getId(), itemId, promoId, amount, stockLogId)) {
-                    throw new BusinessException(EmBusinessError.UNKNOWN_ERROR, "下单失败");
-                }
-                return null;
+        Future<Object> future = executorService.submit(() -> {
+            //加入库存流水init状态
+            String stockLogId = itemService.initStockLog(itemId, amount);
+            //再去完成对应的下单事务型消息机制
+            if (!mqProducer.transactionAsyncReduceStock(userModel.getId(), itemId, promoId, amount, stockLogId)) {
+                throw new BusinessException(EmBusinessError.UNKNOWN_ERROR, "下单失败");
             }
+            return null;
         });
 
         try {

@@ -17,6 +17,7 @@ import sun.misc.BASE64Encoder;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Random;
@@ -106,7 +107,7 @@ public class UserController extends BaseController{
         BASE64Encoder base64Encoder = new BASE64Encoder();
 
         //加密字符串
-        String newStr = base64Encoder.encode(md5.digest(str.getBytes("UTF-8")));
+        String newStr = base64Encoder.encode(md5.digest(str.getBytes(StandardCharsets.UTF_8)));
         return newStr;
     }
 
@@ -124,7 +125,7 @@ public class UserController extends BaseController{
         httpServletRequest.getSession().setAttribute(telephone,optCode);
 
         //将OTP验证码通过短信通道发送给用户，省略
-        System.out.println("telephone = "+telephone+"&otpCode = "+optCode);
+        System.out.println("telephone = "+telephone+" & otpCode = "+optCode);
 
         return CommonReturnType.create(null);
     }
