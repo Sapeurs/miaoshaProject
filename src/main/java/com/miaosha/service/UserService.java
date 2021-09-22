@@ -16,5 +16,5 @@ public interface UserService {
     telephone:用户注册的手机
     encryptPassword:用户加密后的密码
      */
-    UserModel validateLogin(String telephone,String encryptPassword) throws BusinessException;
+    UserModel validateLogin(String telephone, String encryptPassword) throws BusinessException;
 }

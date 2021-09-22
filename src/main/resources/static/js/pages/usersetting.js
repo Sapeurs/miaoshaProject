@@ -1,5 +1,5 @@
 //表单验证
-$(document).ready(function() {
+$(document).ready(function () {
     $('#profileForm').formValidation({
         framework: 'bootstrap',
         icon: {
@@ -8,8 +8,8 @@ $(document).ready(function() {
             validating: 'glyphicon glyphicon-refresh'
         },
         fields: {
-        	nickname: {
-        		trigger: 'blur',
+            nickname: {
+                trigger: 'blur',
                 validators: {
                     notEmpty: {
                         message: '快想个昵称'
@@ -22,7 +22,7 @@ $(document).ready(function() {
                 }
             },
             domain: {
-            	trigger: 'blur',
+                trigger: 'blur',
                 validators: {
                     stringLength: {
                         min: 1,
@@ -32,9 +32,9 @@ $(document).ready(function() {
                 }
             },
             intro: {
-            	trigger: 'blur',
+                trigger: 'blur',
                 validators: {
-                	stringLength: {
+                    stringLength: {
                         min: 1,
                         max: 140,
                         message: '最多140个字符'
@@ -43,7 +43,7 @@ $(document).ready(function() {
             }
         }
     });
-    
+
     $('#changePassForm').formValidation({
         framework: 'bootstrap',
         icon: {
@@ -52,8 +52,8 @@ $(document).ready(function() {
             validating: 'glyphicon glyphicon-refresh'
         },
         fields: {
-        	oldpass: {
-        		trigger: 'blur',
+            oldpass: {
+                trigger: 'blur',
                 validators: {
                     notEmpty: {
                         message: '原密码还没有输噢'
@@ -66,7 +66,7 @@ $(document).ready(function() {
                 }
             },
             newpass: {
-            	trigger: 'blur',
+                trigger: 'blur',
                 validators: {
                     notEmpty: {
                         message: '快输个新密码吧'
@@ -79,7 +79,7 @@ $(document).ready(function() {
                 }
             },
             newpass_confirm: {
-            	trigger: 'blur',
+                trigger: 'blur',
                 validators: {
                     notEmpty: {
                         message: '再输一次新密码，别打错了'
@@ -88,7 +88,7 @@ $(document).ready(function() {
                         field: 'newpass',
                         message: '两次新密码输入的不一样'
                     },
-                	stringLength: {
+                    stringLength: {
                         min: 6,
                         max: 20,
                         message: '6到20个字符'
@@ -100,84 +100,84 @@ $(document).ready(function() {
 });
 
 //个人资料的请求
-$("button#submit_profile").click(function(){
-	doUpdate();
+$("button#submit_profile").click(function () {
+    doUpdate();
 });
-$(document).keydown(function(e) {
-	if (e.keyCode == 13 && $('#profile-panel').hasClass("active")) {
-		doUpdate();
-	}else if (e.keyCode == 13 && $('#password-panel').hasClass("active")) {
-		doChange();
-	}
+$(document).keydown(function (e) {
+    if (e.keyCode == 13 && $('#profile-panel').hasClass("active")) {
+        doUpdate();
+    } else if (e.keyCode == 13 && $('#password-panel').hasClass("active")) {
+        doChange();
+    }
 });
 
-function doUpdate(){
-	var nickname = $("#profileForm #nickname").val();
-	var domain = $("#profileForm #domain").val();
-	var intro = $("#profileForm #intro").val();
-	var avatarID = "";
-	
-	$.ajax( {    
-	    url:'/home/users/usersetting',// 跳转到 action    
-	    data:JSON.stringify(
-	    {    
-	    	userName : nickname,    
-	    	personalDomain : domain,
-	    	word : intro,
-	    	avatarId : avatarID
-	    }),    
-	    type:'post',    
-	    cache:false,    
-	    dataType:'json',
-	    contentType:"application/json;charset=utf-8",
-	    success:function(data) {   
-	    	if(data.status=="success"){
-	    		alert("资料修改成功!");
-	    		window.location.reload(true);
-	    	}else if(data.status=="fail"){
-	    		alert(data.data.errMessage);
-	    	}
-	     },    
-	     error : function() {    
-	          // view("异常！");    
-	          alert("异常！");    
-	     }    
-	}); 
-	
+function doUpdate() {
+    var nickname = $("#profileForm #nickname").val();
+    var domain = $("#profileForm #domain").val();
+    var intro = $("#profileForm #intro").val();
+    var avatarID = "";
+
+    $.ajax({
+        url: '/home/users/usersetting',// 跳转到 action
+        data: JSON.stringify(
+            {
+                userName: nickname,
+                personalDomain: domain,
+                word: intro,
+                avatarId: avatarID
+            }),
+        type: 'post',
+        cache: false,
+        dataType: 'json',
+        contentType: "application/json;charset=utf-8",
+        success: function (data) {
+            if (data.status == "success") {
+                alert("资料修改成功!");
+                window.location.reload(true);
+            } else if (data.status == "fail") {
+                alert(data.data.errMessage);
+            }
+        },
+        error: function () {
+            // view("异常！");
+            alert("异常！");
+        }
+    });
+
 }
 
 //修改密码的请求
-$("button#submit_password").click(function(){
-	doChange();
+$("button#submit_password").click(function () {
+    doChange();
 });
 
-function doChange(){
-	var oldPass = $("#changePassForm #oldpass").val();
-	var newPass = $("#changePassForm #newpass").val();
-	
-	$.ajax( {    
-	    url:'/home/users/changepassword',// 跳转到 action    
-	    data:JSON.stringify(
-	    {    
-	    	oldPassword : oldPass,    
-	    	newPassword : newPass
-	    }),    
-	    type:'post',    
-	    cache:false,    
-	    dataType:'json',
-	    contentType:"application/json;charset=utf-8",
-	    success:function(data) {   
-	    	if(data.status=="success"){
-	    		alert("密码修改成功!");
-	    		window.location.reload(true);
-	    	}else if(data.status=="fail"){
-	    		alert(data.data.errMessage);
-	    	}
-	     },    
-	     error : function() {    
-	          // view("异常！");    
-	          alert("异常！");    
-	     }    
-	}); 
-	
+function doChange() {
+    var oldPass = $("#changePassForm #oldpass").val();
+    var newPass = $("#changePassForm #newpass").val();
+
+    $.ajax({
+        url: '/home/users/changepassword',// 跳转到 action
+        data: JSON.stringify(
+            {
+                oldPassword: oldPass,
+                newPassword: newPass
+            }),
+        type: 'post',
+        cache: false,
+        dataType: 'json',
+        contentType: "application/json;charset=utf-8",
+        success: function (data) {
+            if (data.status == "success") {
+                alert("密码修改成功!");
+                window.location.reload(true);
+            } else if (data.status == "fail") {
+                alert(data.data.errMessage);
+            }
+        },
+        error: function () {
+            // view("异常！");
+            alert("异常！");
+        }
+    });
+
 }

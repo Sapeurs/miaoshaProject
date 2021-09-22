@@ -40,7 +40,7 @@ public class UserServiceImpl implements UserService {
     public UserModel getUserById(Integer id) {
         //调用userdomapper获取到对应的用户dataobject
         UserDO userDO = userDOMapper.selectByPrimaryKey(id);
-        if(userDO == null){
+        if (userDO == null) {
             return null;
         }
         //通过用户Id获取对应的用户加密密码信息
@@ -54,7 +54,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void register(UserModel userModel) throws BusinessException {
-        if(userModel == null){
+        if (userModel == null) {
             throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR);
         }
 //        if(StringUtils.isEmpty(userModel.getName())
@@ -66,7 +66,7 @@ public class UserServiceImpl implements UserService {
 //        }
 
         ValidationResult result = validator.validate(userModel);
-        if(result.isHasErrors()){
+        if (result.isHasErrors()) {
             throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR, result.getErrMsg());
         }
 
@@ -76,7 +76,7 @@ public class UserServiceImpl implements UserService {
         try {
             userDOMapper.insertSelective(userDO);
         } catch (DuplicateKeyException e) {
-            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR,"手机号已注册！");
+            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR, "手机号已注册！");
         }
 
         userModel.setId(userDO.getId());
@@ -90,11 +90,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserModel getUserByIdInCache(Integer id) {
-        UserModel userModel = (UserModel) redisTemplate.opsForValue().get("user_validate_"+id);
-        if (userModel == null){
+        UserModel userModel = (UserModel) redisTemplate.opsForValue().get("user_validate_" + id);
+        if (userModel == null) {
             userModel = getUserById(id);
-            redisTemplate.opsForValue().set("user_validate_"+id,userModel);
-            redisTemplate.expire("user_validate_"+id,10, TimeUnit.MINUTES);
+            redisTemplate.opsForValue().set("user_validate_" + id, userModel);
+            redisTemplate.expire("user_validate_" + id, 10, TimeUnit.MINUTES);
         }
         return userModel;
     }
@@ -103,30 +103,30 @@ public class UserServiceImpl implements UserService {
     public UserModel validateLogin(String telephone, String encryptPassword) throws BusinessException {
         //通过用户的手机获取用户信息
         UserDO userDO = userDOMapper.selectByTelephone(telephone);
-        if(userDO == null){
+        if (userDO == null) {
             throw new BusinessException(EmBusinessError.USER_LOGIN_FAIL);
         }
         UserPasswordDO userPasswordDO = userPasswordDOMapper.selectByUserId(userDO.getId());
         UserModel userModel = convertFromDataObject(userDO, userPasswordDO);
 
         //比对用户信息内加密的密码是否和传输进来的密码相匹配
-        if(!StringUtils.equals(encryptPassword,userModel.getEncryptPassword())){
+        if (!StringUtils.equals(encryptPassword, userModel.getEncryptPassword())) {
             throw new BusinessException(EmBusinessError.USER_LOGIN_FAIL);
         }
         return userModel;
     }
 
-    private UserDO convertFromModel(UserModel userModel){
+    private UserDO convertFromModel(UserModel userModel) {
         UserDO userDO = new UserDO();
-        if(userModel == null){
+        if (userModel == null) {
             return null;
         }
-        BeanUtils.copyProperties(userModel,userDO);
+        BeanUtils.copyProperties(userModel, userDO);
         return userDO;
     }
 
-    private UserPasswordDO convertPasswordFromModel(UserModel userModel){
-        if(userModel == null){
+    private UserPasswordDO convertPasswordFromModel(UserModel userModel) {
+        if (userModel == null) {
             return null;
         }
 
@@ -136,15 +136,15 @@ public class UserServiceImpl implements UserService {
         return userPasswordDO;
     }
 
-    private UserModel convertFromDataObject(UserDO userDO, UserPasswordDO userPasswordDO){
+    private UserModel convertFromDataObject(UserDO userDO, UserPasswordDO userPasswordDO) {
 
-        if(userDO == null){
+        if (userDO == null) {
             return null;
         }
         UserModel userModel = new UserModel();
-        BeanUtils.copyProperties(userDO,userModel);
+        BeanUtils.copyProperties(userDO, userModel);
 
-        if(userPasswordDO != null){
+        if (userPasswordDO != null) {
             userModel.setEncryptPassword(userPasswordDO.getEncryptPassword());
         }
         return userModel;

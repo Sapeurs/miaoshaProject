@@ -1,9 +1,9 @@
-(function($) {
+(function ($) {
     var methods = {
-        init: function(options) {
+        init: function (options) {
             var $this = this;
             options = $.extend($.fn.teampopover.options, options);
-            return this.each(function() {
+            return this.each(function () {
                 var $this = $(this);
                 var teamEntity = options.teamEntity;
                 var idName = options.idName;
@@ -28,16 +28,16 @@
                     html: true,
                     animation: false,
                     container: "body",
-                    content: (function(arg) {
-                        return function() {
+                    content: (function (arg) {
+                        return function () {
                             return $this.teampopover("getPopoverHtml", teamEntity, idName, id);
                         }
                     })(id)
                 });
 
-                $this.on("mouseenter", (function(arg) {
-                    return function(e) {
-                        var appearTimeOut = setTimeout(function() {
+                $this.on("mouseenter", (function (arg) {
+                    return function (e) {
+                        var appearTimeOut = setTimeout(function () {
                             appearTimeOut = null;
                             $this.off("mouseleave");
                             if ($this.data('bs.popover').tip().hasClass('in')) {
@@ -46,26 +46,26 @@
                             $this.teampopover("showPopover");
 
                             var timeout = null;
-                            $this.on("mouseleave", function(e) {
-                                timeout = setTimeout(function() {
+                            $this.on("mouseleave", function (e) {
+                                timeout = setTimeout(function () {
                                     $this.teampopover("hidePopover");
                                 }, 500);
                             });
-                            
+
                             $("#" + idName + arg).parent().parent().off("mouseenter");
-                            $("#" + idName + arg).parent().parent().on("mouseenter", function() {
+                            $("#" + idName + arg).parent().parent().on("mouseenter", function () {
                                 if (timeout != null) {
                                     clearTimeout(timeout);
                                     timeout = null;
                                 }
                                 $("#" + idName + arg).parent().parent().off("mouseleave");
-                                $("#" + idName + arg).parent().parent().on("mouseleave", function() {
+                                $("#" + idName + arg).parent().parent().on("mouseleave", function () {
                                     $this.teampopover("hidePopover");
                                 });
                             });
                         }, 500);
 
-                        $this.on("mouseleave", function() {
+                        $this.on("mouseleave", function () {
                             if (appearTimeOut != null) {
                                 clearTimeout(appearTimeOut);
                                 appearTimeOut = null;
@@ -74,11 +74,11 @@
                     }
                 })(id));
 
-                $this.on('shown.bs.popover', (function(arg) {
+                $this.on('shown.bs.popover', (function (arg) {
                     if (shownFunc != null) {
                         return shownFunc;
                     } else {
-                        return function(e) {
+                        return function (e) {
                             var hasLogin = $this.data("hasLogin");
                             var redirectLoginUrl = $this.data("redirectLoginUrl");
                             var dataplacement = $this.data("placement");
@@ -99,7 +99,7 @@
                             $('.popover').css('left', newLeft + "px");
                             $('.arrow').css('left', contentWidth / 2 + 50 + 'px');
 
-                            $("[data-popoverfollowteamid]").on("click", function(e) {
+                            $("[data-popoverfollowteamid]").on("click", function (e) {
                                 e.preventDefault();
                                 if (!hasLogin) {
                                     window.location.href = redirectLoginUrl;
@@ -119,18 +119,18 @@
                                         contentType: "application/x-www-form-urlencoded",
                                         url: "/teams/followteam",
                                         data: "team_id=" + followTeamId,
-                                        beforeSend: function() {
+                                        beforeSend: function () {
                                             var currentReq = $("[data-popoverfollowteamid]").data("jRequest");
                                             if (currentReq != null) {
                                                 currentReq.abort();
                                             }
                                         },
-                                        complete: function() {
+                                        complete: function () {
                                             $("[data-popoverFollowTeamId]").data("jRequest", null);
                                         },
-                                        success: function(data) {
+                                        success: function (data) {
                                         },
-                                        error: function(data) {
+                                        error: function (data) {
                                             if (data.statusText == "abort") {
                                                 return;
                                             }
@@ -157,18 +157,18 @@
                                         contentType: "application/x-www-form-urlencoded",
                                         url: "/teams/unfollowteam",
                                         data: "team_id=" + followTeamId,
-                                        beforeSend: function() {
+                                        beforeSend: function () {
                                             var currentReq = $("[data-popoverfollowteamid]").data("jRequest");
                                             if (currentReq != null) {
                                                 currentReq.abort();
                                             }
                                         },
-                                        complete: function() {
+                                        complete: function () {
                                             $("[data-popoverfollowteamid]").data("jRequest", null);
                                         },
-                                        success: function(data) {
+                                        success: function (data) {
                                         },
-                                        error: function(data) {
+                                        error: function (data) {
                                             if (data.statusText == "abort") {
                                                 return;
                                             }
@@ -189,21 +189,21 @@
                 })(id));
             });
         },
-        showPopover: function() {
+        showPopover: function () {
             var $this = this;
-            return this.each(function() {
+            return this.each(function () {
                 //hide掉其他所有的
                 $("[data-teampopover]").popover("hide");
                 $this.popover("show");
             });
         },
-        hidePopover: function() {
+        hidePopover: function () {
             var $this = this;
-            return this.each(function() {
+            return this.each(function () {
                 $this.popover("hide");
             });
         },
-        getPopoverHtml: function(teamEntity, idName, id) {
+        getPopoverHtml: function (teamEntity, idName, id) {
             if (teamEntity == null) {
                 return null;
             }
@@ -215,7 +215,7 @@
                 teamPopoverFollowStr = "",
                 teamPopoverFollowStrClass = "",
                 fromTeamId = teamEntity.id;
-            
+
             if (teamEntity.hasFollow == 1) {
                 teamPopoverFollowStr = "已关注";
                 teamPopoverFollowStrClass = "btnBlue active ";
@@ -247,7 +247,7 @@
         }
     };
 
-    $.fn.teampopover = function(method) {
+    $.fn.teampopover = function (method) {
 
         // Method calling logic  
         if (methods[method]) {

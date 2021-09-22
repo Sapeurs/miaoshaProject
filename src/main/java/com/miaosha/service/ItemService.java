@@ -24,14 +24,14 @@ public interface ItemService {
     boolean increaseStock(Integer itemId, Integer amount) throws BusinessException;
 
     //异步更新库存
-    boolean asyncDecreaseStock(Integer itemId,Integer amount);
+    boolean asyncDecreaseStock(Integer itemId, Integer amount);
 
     //item及promo model缓存模型
     ItemModel getItemByIdInCache(Integer id);
 
     //商品销量增加
-    void increaseSales(Integer itemId,Integer amount) throws BusinessException;
+    void increaseSales(Integer itemId, Integer amount) throws BusinessException;
 
     //初始化库存流水
-    String initStockLog(Integer itemId,Integer amount);
+    String initStockLog(Integer itemId, Integer amount);
 }

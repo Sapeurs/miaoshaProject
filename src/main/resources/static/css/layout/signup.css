@@ -1,24 +1,30 @@
-body{
-  background-color: #2F2F2F;
+body {
+    background-color: #2F2F2F;
 }
-.title{
-  margin: 60px 0 40px;
+
+.title {
+    margin: 60px 0 40px;
 }
-.form-sign-in{
-  max-width: 280px;
-  margin: 0 auto;
+
+.form-sign-in {
+    max-width: 280px;
+    margin: 0 auto;
 }
-p{
-  margin-top: 8px;
+
+p {
+    margin-top: 8px;
 }
-label{
-  color: #fff;
-  margin-bottom: 10px;
-  font-weight: 300;
+
+label {
+    color: #fff;
+    margin-bottom: 10px;
+    font-weight: 300;
 }
-.btn{
-  margin: 40px 0 16px;
+
+.btn {
+    margin: 40px 0 16px;
 }
-.has-feedback label~.form-control-feedback {
+
+.has-feedback label ~ .form-control-feedback {
     top: 30px;
 }

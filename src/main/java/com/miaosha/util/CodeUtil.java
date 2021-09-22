@@ -20,17 +20,18 @@ public class CodeUtil {
     private static int codeCount = 4;// 定义图片上显示验证码的个数
     private static int xx = 15;
     private static int fontHeight = 18;
-    private static  int codeY = 16;
-    private static char[] codeSequence = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R',
-            'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+    private static int codeY = 16;
+    private static char[] codeSequence = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R',
+            'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
 
     /**
      * 生成一个map集合
      * code为生成的验证码
      * codePic为生成的验证码BufferedImage对象
+     *
      * @return
      */
-    public static Map<String,Object> generateCodeAndPic() {
+    public static Map<String, Object> generateCodeAndPic() {
         // 定义图像buffer
         BufferedImage buffImg = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         // Graphics2D gd = buffImg.createGraphics();
@@ -81,7 +82,7 @@ public class CodeUtil {
             // 将产生的四个随机数组合在一起。
             randomCode.append(code);
         }
-        Map<String,Object> map  =new HashMap<String,Object>();
+        Map<String, Object> map = new HashMap<String, Object>();
         //存放验证码
         map.put("code", randomCode);
         //存放生成的验证码BufferedImage对象
@@ -91,9 +92,9 @@ public class CodeUtil {
 
     public static void main(String[] args) throws Exception {
         //创建文件输出流对象
-        OutputStream out = new FileOutputStream("/"+System.currentTimeMillis()+".jpg");
-        Map<String,Object> map = CodeUtil.generateCodeAndPic();
+        OutputStream out = new FileOutputStream("/" + System.currentTimeMillis() + ".jpg");
+        Map<String, Object> map = CodeUtil.generateCodeAndPic();
         ImageIO.write((RenderedImage) map.get("codePic"), "jpeg", out);
-        System.out.println("验证码的值为："+map.get("code"));
+        System.out.println("验证码的值为：" + map.get("code"));
     }
 }

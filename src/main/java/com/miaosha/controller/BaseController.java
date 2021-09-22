@@ -1,8 +1,8 @@
 package com.miaosha.controller;
 
-public class BaseController{
+public class BaseController {
 
-    public static final String CONTENT_TYPE_FORMED="application/x-www-form-urlencoded";
+    public static final String CONTENT_TYPE_FORMED = "application/x-www-form-urlencoded";
 
     //定义exceptionHandler解决未被controller层吸收的exception
 //    @ExceptionHandler(Exception.class)

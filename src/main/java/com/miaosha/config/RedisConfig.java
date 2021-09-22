@@ -20,7 +20,7 @@ import org.springframework.session.data.redis.config.annotation.web.http.EnableR
 public class RedisConfig {
 
     @Bean
-    public RedisTemplate redisTemplate(RedisConnectionFactory redisConnectionFactory){
+    public RedisTemplate redisTemplate(RedisConnectionFactory redisConnectionFactory) {
         RedisTemplate redisTemplate = new RedisTemplate();
         redisTemplate.setConnectionFactory(redisConnectionFactory);
 
@@ -34,8 +34,8 @@ public class RedisConfig {
         ObjectMapper objectMapper = new ObjectMapper();
         SimpleModule simpleModule = new SimpleModule();
 
-        simpleModule.addSerializer(DateTime.class,new JodaDateTimeJsonSerializer());
-        simpleModule.addDeserializer(DateTime.class,new JodaDateTimeJsonDeserializer());
+        simpleModule.addSerializer(DateTime.class, new JodaDateTimeJsonSerializer());
+        simpleModule.addDeserializer(DateTime.class, new JodaDateTimeJsonDeserializer());
 
         objectMapper.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
 

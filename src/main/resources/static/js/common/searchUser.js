@@ -1,9 +1,9 @@
-(function($) {
+(function ($) {
     var methods = {
-        init: function(options) {
+        init: function (options) {
             var $this = this;
             options = $.extend($.fn.searchUser.options, options);
-            return this.each(function() {
+            return this.each(function () {
                 var $thisSearchUser = $(this);
                 var userData = [].concat(options.userData); // 用户数组[{userId, userName}](解除引用传递)
                 var adjustLeftComponent = options.adjustLeftComponent; // 对齐控件
@@ -13,7 +13,7 @@
                 var deleteOneUserFunc = options.deleteOneUserFunc;  //删除一个用户的回调函数
                 var addOneUserFunc = options.addOneUserFunc;   //加入一个用户的回调函数
 
-                $thisSearchUser.data("userData", userData); 
+                $thisSearchUser.data("userData", userData);
                 $thisSearchUser.data("adjustLeftComponent", adjustLeftComponent);
                 $thisSearchUser.data("limitUser", limitUser);
                 $thisSearchUser.data("isChangeable", isChangeable);
@@ -21,21 +21,19 @@
                 $thisSearchUser.data("deleteOneUserFunc", deleteOneUserFunc);
                 $thisSearchUser.data("addOneUserFunc", addOneUserFunc);
 
-                
+
                 //初始化外部预设的user
                 $(".drUserSpanContainer").off("click");
                 $(".drUserSpanContainer").remove();
-                
-                
-                
-                for(var i = 0; i < userData.length; i++){
-                	 $thisSearchUser.searchUser("addOneUserSpanView",userData[i]);
+
+
+                for (var i = 0; i < userData.length; i++) {
+                    $thisSearchUser.searchUser("addOneUserSpanView", userData[i]);
                 }
-                
+
                 //初始化placeholder
-                $thisSearchUser.searchUser("setChangeable",isChangeable);
- 
-                
+                $thisSearchUser.searchUser("setChangeable", isChangeable);
+
 
                 // 搜索用户
                 function searchUserKeyword(keyword) {
@@ -50,14 +48,14 @@
                         type: "GET",
                         contentType: "application/x-www-form-urlencoded",
                         url: "/indexhome/indexsearch?type=2&searchtype=3&top=8&keyword=" + keyword,
-                        beforeSend: function() {
+                        beforeSend: function () {
                             $('#loadingBar').drloadingbar("startLoad");
                             var currentReq = $("#drSearchUserContainer").data("jRequest");
                             if (currentReq != null) { // 前面的请求还未完成
                                 currentReq.abort();
                             }
                         },
-                        success: function(data) {
+                        success: function (data) {
                             $('#loadingBar').drloadingbar("stopLoad");
                             var userArray = data.content,
                                 userLength = userArray.length;
@@ -68,36 +66,36 @@
                                 $("#drSearchUserContainer").popover("show");
                                 for (var i = 0; i < userLength; i++) {
                                     $element = $("<li class='drUserInputPopoverSearchList'><span><img src='" + userArray[i].avatarThumbUrl + "&w=60&h=60' class='img-circle' /></span><span data-userid='" + userArray[i].id + "' ><strong>" + $.htmlspecialchars(userArray[i].userName) + "</strong></span></li>");
-                                    if(i == 0){ // 默认选中第一个用户
-                                    	$element.addClass("isActive");
+                                    if (i == 0) { // 默认选中第一个用户
+                                        $element.addClass("isActive");
                                     }
                                     $element.appendTo($("#drUserInputPopoverSearch"));
                                 }
                                 $("#drUserInputPopoverSearch").off("mouseenter");
-	                            $("#drUserInputPopoverSearch").off("click");
-	                            // 鼠标移到上面高亮显示
-	                            $("#drUserInputPopoverSearch").on("mouseenter", ".drUserInputPopoverSearchList", function() {
-	                            	if(!$(this).hasClass("isActive")){
-	                                	$(".drUserInputPopoverSearchList.isActive").each(function(){
-	                                		$(this).removeClass("isActive");
-	                                	});
-	                                	$(this).addClass("isActive");
-	                            	}
-	                            });
-	                            // 鼠标单击选中
-	                            $("#drUserInputPopoverSearch").on("click", ".drUserInputPopoverSearchList.isActive", function(e) {
-	    	                        var content = $(this).find("span strong").text();
-	    	                        var userId = $(this).find("span[data-userid]").attr("data-userid");
-	    	                        $thisSearchUser.searchUser("addOneUser",userId, content);
-	    	                        $("#drSearchUser").focus();
-	                            });
+                                $("#drUserInputPopoverSearch").off("click");
+                                // 鼠标移到上面高亮显示
+                                $("#drUserInputPopoverSearch").on("mouseenter", ".drUserInputPopoverSearchList", function () {
+                                    if (!$(this).hasClass("isActive")) {
+                                        $(".drUserInputPopoverSearchList.isActive").each(function () {
+                                            $(this).removeClass("isActive");
+                                        });
+                                        $(this).addClass("isActive");
+                                    }
+                                });
+                                // 鼠标单击选中
+                                $("#drUserInputPopoverSearch").on("click", ".drUserInputPopoverSearchList.isActive", function (e) {
+                                    var content = $(this).find("span strong").text();
+                                    var userId = $(this).find("span[data-userid]").attr("data-userid");
+                                    $thisSearchUser.searchUser("addOneUser", userId, content);
+                                    $("#drSearchUser").focus();
+                                });
                             } else {
                                 if ($thisSearchUser.searchUser("isUserSearchShown")) {
                                     $("#drSearchUserContainer").popover("hide");
                                 }
                             }
                         },
-                        error: function(data) {
+                        error: function (data) {
                             if (data.statusText == "abort") {
                                 return;
                             }
@@ -106,10 +104,11 @@
                     });
                     $("#drSearchUserContainer").data("jRequest", jRequest);
                 }
+
                 // 粘贴事件
-                $("#drSearchUser").on("paste", function(e) {
-                	var userData = $thisSearchUser.data("userData");
-                	var limitUser = $thisSearchUser.data("limitUser");
+                $("#drSearchUser").on("paste", function (e) {
+                    var userData = $thisSearchUser.data("userData");
+                    var limitUser = $thisSearchUser.data("limitUser");
                     if (userData.length >= limitUser) {
                         // 提示只能输入多少个用户
                         $("#drUserInputErrorPopoverContent").text("只能添加 " + limitUser + " 个用户");
@@ -130,44 +129,44 @@
                     searchUserKeyword($(this).text());
                 });
                 // 光标离开事件
-                $("#drSearchUser").on("blur", function(e) {
-                	//return;
+                $("#drSearchUser").on("blur", function (e) {
+                    //return;
                     if ($thisSearchUser.searchUser("isUserInputErrorShown")) {
                         $("#drSearchUser").popover("hide");
                     }
                     if ($thisSearchUser.searchUser("isUserSearchShown")) {
-                        setTimeout(function() {
+                        setTimeout(function () {
                             // 延迟200毫秒触发，否则若点击在content cell内部则立马被hide掉，无法触发
                             $("#drSearchUserContainer").popover("hide");
                         }, 200);
                     }
                 });
                 // 键盘按键事件
-                $("#drSearchUser").on("keydown", function(e) {
-                	var userData = $thisSearchUser.data("userData");
-                	var limitUser = $thisSearchUser.data("limitUser");
-                	var isChangeable = $thisSearchUser.data("isChangeable");
+                $("#drSearchUser").on("keydown", function (e) {
+                    var userData = $thisSearchUser.data("userData");
+                    var limitUser = $thisSearchUser.data("limitUser");
+                    var isChangeable = $thisSearchUser.data("isChangeable");
                     var keyCode = e.keyCode;
-                    if(!isChangeable){
-                    	e.preventDefault();
-                    	return;
+                    if (!isChangeable) {
+                        e.preventDefault();
+                        return;
                     }
                     if (keyCode == 8 || keyCode == 46) { // BackSpace, Delete
-                    	if ($thisSearchUser.searchUser("isUserInputErrorShown")) {
+                        if ($thisSearchUser.searchUser("isUserInputErrorShown")) {
                             $("#drSearchUser").popover("hide");
                         }
                         if ($(this).text() == "" && userData.length > 0) {
-                        	e.preventDefault();
-                        	$thisSearchUser.searchUser("deleteOneUser");
+                            e.preventDefault();
+                            $thisSearchUser.searchUser("deleteOneUser");
                             return;
                         }
                     }
                     if (userData.length >= limitUser) {
-                    	e.preventDefault();
-                    	$(this).text("");
+                        e.preventDefault();
+                        $(this).text("");
                         if (!$thisSearchUser.searchUser("isUserInputErrorShown")) {
-                        	$("#drSearchUser").popover("show");
-                        	// 提示只能输入多少个用户
+                            $("#drSearchUser").popover("show");
+                            // 提示只能输入多少个用户
                             $("#drUserInputErrorPopoverContent").text("只能添加 " + limitUser + " 个用户");
                         }
                         return;
@@ -179,15 +178,15 @@
                         e.preventDefault();
                         // 处理标签
                         if ($thisSearchUser.searchUser("isUserSearchShown")) {
-                        	var content = $(".drUserInputPopoverSearchList.isActive span strong").text();
-                        	var userId = $(".drUserInputPopoverSearchList.isActive span[data-userid]").attr("data-userid");
-                        	$thisSearchUser.searchUser("addOneUser",userId, content);
+                            var content = $(".drUserInputPopoverSearchList.isActive span strong").text();
+                            var userId = $(".drUserInputPopoverSearchList.isActive span[data-userid]").attr("data-userid");
+                            $thisSearchUser.searchUser("addOneUser", userId, content);
                             $("#drSearchUserContainer").popover("hide");
                         }
                     } else if (keyCode == 40) { // 下方向键
                         if ($thisSearchUser.searchUser("isUserSearchShown")) {
-                        	var $nextNode = $($(".drUserInputPopoverSearchList.isActive")[0].nextSibling);
-                        	$(".drUserInputPopoverSearchList.isActive").removeClass("isActive");
+                            var $nextNode = $($(".drUserInputPopoverSearchList.isActive")[0].nextSibling);
+                            $(".drUserInputPopoverSearchList.isActive").removeClass("isActive");
                             if ($nextNode.length == 0) {
                                 // 指向第一个
                                 $(".drUserInputPopoverSearchList").first().addClass("isActive");
@@ -198,9 +197,9 @@
                         }
                     } else if (keyCode == 38) { // 上方向键
                         if ($thisSearchUser.searchUser("isUserSearchShown")) {
-                        	var $previousNode = $($(".drUserInputPopoverSearchList.isActive")[0].previousSibling);
-                        	$(".drUserInputPopoverSearchList.isActive").removeClass("isActive");
-                        	if ($previousNode.length == 0) {
+                            var $previousNode = $($(".drUserInputPopoverSearchList.isActive")[0].previousSibling);
+                            $(".drUserInputPopoverSearchList.isActive").removeClass("isActive");
+                            if ($previousNode.length == 0) {
                                 // 指向最后一个
                                 $(".drUserInputPopoverSearchList").last().addClass("isActive");
                             } else {
@@ -210,7 +209,7 @@
                         }
                     } else {
                         var $this = $(this);
-                        setTimeout(function() {
+                        setTimeout(function () {
                             searchUserKeyword($this.text());
                         }, 100);
                     }
@@ -232,12 +231,12 @@
                     content: "<div id='userInputPopoverSearchContainer'><ul id='drUserInputPopoverSearch'></ul></div>"
                 });
                 // 搜索弹出框显示后调整位置
-                $("#drSearchUserContainer").on('shown.bs.popover', function(e) {
+                $("#drSearchUserContainer").on('shown.bs.popover', function (e) {
                     if (e.target != $("#drSearchUserContainer")[0]) {
                         return;
                     }
                     var topVal = parseInt($('#drSearchUserContainer+.popover').css('top').substr(0, $('#drSearchUserContainer+.popover').css('top').length - 2)),
-                    	inText = $("#drSearchUser").text();
+                        inText = $("#drSearchUser").text();
                     $('#drSearchUserContainer+.popover').css('top', (topVal - 15) + 'px');
                     // 重新计算left
                     var left = 0;
@@ -252,69 +251,69 @@
                     $('#drSearchUserContainer+.popover .arrow').css('left', (20 + 14 * inText.length / 2) + 'px');
                 });
                 // 单击删除一个用户
-                $thisSearchUser.on("click", ".drUserSpanContainer", function(e) {
-                	var isChangeable = $thisSearchUser.data("isChangeable");
-                	if(!isChangeable){
-                    	e.preventDefault();
-                    	return;
+                $thisSearchUser.on("click", ".drUserSpanContainer", function (e) {
+                    var isChangeable = $thisSearchUser.data("isChangeable");
+                    if (!isChangeable) {
+                        e.preventDefault();
+                        return;
                     }
-                	$thisSearchUser.searchUser("deleteOneUser",$(e.target).data("userid"));
+                    $thisSearchUser.searchUser("deleteOneUser", $(e.target).data("userid"));
                 });
             });
         }, // init End
-        getUserArray: function() {
+        getUserArray: function () {
             return this.data("userData");
         },
-        resetData:function(userData,isChangeable,limitUser){
-        	this.data("userData", userData);
-        	this.data("limitUser", limitUser);
-        	this.searchUser("setChangeable", isChangeable);
+        resetData: function (userData, isChangeable, limitUser) {
+            this.data("userData", userData);
+            this.data("limitUser", limitUser);
+            this.searchUser("setChangeable", isChangeable);
             $(".drUserSpanContainer").off("click");
             $(".drUserSpanContainer").remove();
-            for(var i = 0; i < userData.length; i++){
-            	 this.searchUser("addOneUserSpanView", userData[i]);
+            for (var i = 0; i < userData.length; i++) {
+                this.searchUser("addOneUserSpanView", userData[i]);
             }
         },
 
-        setPlaceholder:function(text){
-           var userData = this.data("userData");
-           if(userData.length > 0){
-        	   $("#drSearchUser")[0].setAttribute("data-placeholder", "");
-           }else{
-               $("#drSearchUser")[0].setAttribute("data-placeholder", text);
-           }
+        setPlaceholder: function (text) {
+            var userData = this.data("userData");
+            if (userData.length > 0) {
+                $("#drSearchUser")[0].setAttribute("data-placeholder", "");
+            } else {
+                $("#drSearchUser")[0].setAttribute("data-placeholder", text);
+            }
 
         },
-        setChangeable:function(isChangeable){
-            this.data("isChangeable",isChangeable);
+        setChangeable: function (isChangeable) {
+            this.data("isChangeable", isChangeable);
             var placeholder = this.data("placeholder");
-            if(isChangeable){
+            if (isChangeable) {
                 $("#drSearchUser").css("visibility", "visible");
-                this.searchUser("setPlaceholder",placeholder);
-            }else{
+                this.searchUser("setPlaceholder", placeholder);
+            } else {
                 $("#drSearchUser").css("visibility", "hidden");
             }
         },
         // 错误输入框popover是否存在
-        isUserInputErrorShown:function(){
-        	if($("#drSearchUser").data('bs.popover') != null){
+        isUserInputErrorShown: function () {
+            if ($("#drSearchUser").data('bs.popover') != null) {
                 return $("#drSearchUser").data('bs.popover').tip().hasClass('in');
-        	}else{
-        		return false;
-        	}
+            } else {
+                return false;
+            }
 
         },
         // 用户popover是否存在
-        isUserSearchShown:function(){
-        	if($("#drSearchUserContainer").data('bs.popover') != null){
-        	      return $("#drSearchUserContainer").data('bs.popover').tip().hasClass('in');
-        	}else{
-        		return false;
-        	}
-      
+        isUserSearchShown: function () {
+            if ($("#drSearchUserContainer").data('bs.popover') != null) {
+                return $("#drSearchUserContainer").data('bs.popover').tip().hasClass('in');
+            } else {
+                return false;
+            }
+
         },
         //删除一个用户
-        deleteOneUser:function(userId) {
+        deleteOneUser: function (userId) {
             var userData = this.data("userData");
             var placeholder = this.data("placeholder");
             var deleteOneUserFunc = this.data("deleteOneUserFunc");
@@ -324,42 +323,42 @@
                     $("#drSearchUser").popover("hide");
                 }
             }
-            
-            if(userData.length == 0){
+
+            if (userData.length == 0) {
                 return;
             }
             var deleteUserData = {};
-            if(userId == null){
+            if (userId == null) {
                 //删除最后一个
                 var $deleteElement = $($(".drUserSpanContainer")[userData.length - 1]);
                 $deleteElement.off("click");
                 $deleteElement.remove();
-                deleteUserData = userData[userData.length-1];
-                userData.splice(userData.length-1, 1);
-                this.searchUser("setPlaceholder",placeholder);
-            }else{
-                var $deleteElement = $(".drUserSpanContainer[data-userid="+userId+"]");
+                deleteUserData = userData[userData.length - 1];
+                userData.splice(userData.length - 1, 1);
+                this.searchUser("setPlaceholder", placeholder);
+            } else {
+                var $deleteElement = $(".drUserSpanContainer[data-userid=" + userId + "]");
                 $deleteElement.off("click");
                 $deleteElement.remove();
-                for(var i = 0; i < userData.length; i++){
-                    if(userData[i].userId == userId){
+                for (var i = 0; i < userData.length; i++) {
+                    if (userData[i].userId == userId) {
                         deleteUserData = userData[i];
                         userData.splice(i, 1);
 
                         break;
                     }
                 }
-                this.searchUser("setPlaceholder",placeholder);
+                this.searchUser("setPlaceholder", placeholder);
             }
-            if(deleteOneUserFunc != null){
-            	if(arguments.length <= 1){
+            if (deleteOneUserFunc != null) {
+                if (arguments.length <= 1) {
                     deleteOneUserFunc(deleteUserData);
-            	}
+                }
 
             }
         },
         //增加用户对应的view操作
-        addOneUserSpanView:function(userDataElement){
+        addOneUserSpanView: function (userDataElement) {
             $element = $("<span></span>");
             $element.text(userDataElement.userName);
             $element.attr("data-userid", userDataElement.userId);
@@ -367,7 +366,7 @@
             $element.insertBefore($("#drSearchUserContainer"));
         },
         // 增加用户
-        addOneUser:function(userId, userName) {
+        addOneUser: function (userId, userName) {
             var userData = this.data("userData");
             var placeholder = this.data("placeholder");
             var limitUser = this.data("limitUser");
@@ -384,38 +383,38 @@
                 }
                 return;
             }
-            
-            for(var i = 0; i < userData.length; i++){
-                if(userId == userData[i].userId){
+
+            for (var i = 0; i < userData.length; i++) {
+                if (userId == userData[i].userId) {
                     //提示重复
-                    if(!this.searchUser("isUserInputErrorShown")){
+                    if (!this.searchUser("isUserInputErrorShown")) {
                         $("#drSearchUser").popover("show");
                         $("#drUserInputErrorPopoverContent").text("已经添加了该用户");
                     }
                     return;
                 }
             }
-            var addUserData = {userId:userId, userName:userName};
+            var addUserData = {userId: userId, userName: userName};
             userData.push(addUserData);
-            this.searchUser("setPlaceholder",placeholder);
+            this.searchUser("setPlaceholder", placeholder);
             // 添加一个标签
-            this.searchUser("addOneUserSpanView",addUserData);
-            
+            this.searchUser("addOneUserSpanView", addUserData);
+
             $("#drSearchUser").text("");
-            if(this.searchUser("isUserSearchShown")){
+            if (this.searchUser("isUserSearchShown")) {
                 $("#drSearchUserContainer").popover("hide");
             }
-            if(addOneUserFunc != null){
-            	if(arguments.length <= 2){
+            if (addOneUserFunc != null) {
+                if (arguments.length <= 2) {
                     addOneUserFunc(addUserData);
-            	}
+                }
 
             }
         }
-        
+
     };
 
-    $.fn.searchUser = function(method) {
+    $.fn.searchUser = function (method) {
         // Method calling logic
         if (methods[method]) {
             return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));

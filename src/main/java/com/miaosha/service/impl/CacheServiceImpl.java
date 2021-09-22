@@ -11,10 +11,10 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class CacheServiceImpl implements CacheService {
 
-    private Cache<String,Object> commonCache = null;
+    private Cache<String, Object> commonCache = null;
 
     @PostConstruct
-    public void init(){
+    public void init() {
         commonCache = CacheBuilder.newBuilder()
                 //设置缓存容器的初始容量
                 .initialCapacity(10)
@@ -26,7 +26,7 @@ public class CacheServiceImpl implements CacheService {
 
     @Override
     public void setCommonCache(String key, Object value) {
-        commonCache.put(key,value);
+        commonCache.put(key, value);
     }
 
     @Override

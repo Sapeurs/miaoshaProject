@@ -43,10 +43,9 @@ public class OrderServiceImpl implements OrderService {
     private StockLogDOMapper stockLogDOMapper;
 
 
-
     @Override
     @Transactional
-    public OrderModel createOrder(Integer userId, Integer itemId,Integer promoId, Integer amount,String stockLogId) throws BusinessException {
+    public OrderModel createOrder(Integer userId, Integer itemId, Integer promoId, Integer amount, String stockLogId) throws BusinessException {
 
         //1.校验下单状态，下单的商品是否存在，用户是否合法，购买数量是否正确
         ItemModel itemModel = itemService.getItemById(itemId);
@@ -61,8 +60,8 @@ public class OrderServiceImpl implements OrderService {
 //            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR,"用户信息不存在");
 //        }
 
-        if(amount <= 0 || amount > 99){
-            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR,"数量信息不正确");
+        if (amount <= 0 || amount > 99) {
+            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR, "数量信息不正确");
         }
 
         //校验活动信息
@@ -78,7 +77,7 @@ public class OrderServiceImpl implements OrderService {
 
         //2.落单减库存（缓存中）
         boolean result = itemService.decreaseStock(itemId, amount);
-        if (!result){
+        if (!result) {
             throw new BusinessException(EmBusinessError.STOCK_NOT_ENOUGH);
         }
 
@@ -87,9 +86,9 @@ public class OrderServiceImpl implements OrderService {
         orderModel.setUserId(userId);
         orderModel.setItemId(itemId);
         orderModel.setAmount(amount);
-        if (promoId != null){
+        if (promoId != null) {
             orderModel.setItemPrice(itemModel.getPromoModel().getPromoItemPrice());
-        }else {
+        } else {
             orderModel.setItemPrice(itemModel.getPrice());
         }
         orderModel.setPromoId(promoId);
@@ -100,11 +99,11 @@ public class OrderServiceImpl implements OrderService {
         OrderDO orderDO = this.convertFromOrderModel(orderModel);
         orderDOMapper.insertSelective(orderDO);
         //加上商品的销量
-        itemService.increaseSales(itemId,amount);
+        itemService.increaseSales(itemId, amount);
 
         //设置库存流水状态为成功
         StockLogDO stockLogDO = stockLogDOMapper.selectByPrimaryKey(stockLogId);
-        if (stockLogDO==null){
+        if (stockLogDO == null) {
             throw new BusinessException(EmBusinessError.UNKNOWN_ERROR);
         }
         stockLogDO.setStatus(2);
@@ -123,14 +122,13 @@ public class OrderServiceImpl implements OrderService {
 //        });
 
 
-
         //4.返回前端
         return orderModel;
     }
 
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    String generateOrderNo(){
+    String generateOrderNo() {
         StringBuilder stringBuilder = new StringBuilder();
         //订单号有16位
         //前8位为时间信息， 年月日
@@ -142,10 +140,10 @@ public class OrderServiceImpl implements OrderService {
         int sequence = 0;
         SequenceDO sequenceDO = sequenceDOMapper.getSequenceByName("order_info");
         sequence = sequenceDO.getCurrentValue();
-        sequenceDO.setCurrentValue(sequenceDO.getCurrentValue()+sequenceDO.getStep());
+        sequenceDO.setCurrentValue(sequenceDO.getCurrentValue() + sequenceDO.getStep());
         sequenceDOMapper.updateByPrimaryKeySelective(sequenceDO);
         String sequenceStr = String.valueOf(sequence);
-        for (int i = 0; i < 6-sequenceStr.length(); i++) {
+        for (int i = 0; i < 6 - sequenceStr.length(); i++) {
             stringBuilder.append(0);
         }
         stringBuilder.append(sequenceStr);
@@ -155,12 +153,12 @@ public class OrderServiceImpl implements OrderService {
         return stringBuilder.toString();
     }
 
-    private OrderDO convertFromOrderModel(OrderModel orderModel){
-        if(orderModel==null){
+    private OrderDO convertFromOrderModel(OrderModel orderModel) {
+        if (orderModel == null) {
             return null;
         }
         OrderDO orderDO = new OrderDO();
-        BeanUtils.copyProperties(orderModel,orderDO);
+        BeanUtils.copyProperties(orderModel, orderDO);
         return orderDO;
     }
 

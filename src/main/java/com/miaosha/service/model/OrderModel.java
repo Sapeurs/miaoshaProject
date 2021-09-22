@@ -34,5 +34,4 @@ public class OrderModel implements Serializable {
     private BigDecimal orderPrice;
 
 
-
 }

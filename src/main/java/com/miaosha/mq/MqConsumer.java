@@ -51,7 +51,7 @@ public class MqConsumer {
                 Map map = JSON.parseObject(jsonString, Map.class);
                 Integer itemId = (Integer) map.get("itemId");
                 Integer amount = (Integer) map.get("amount");
-                itemStockDOMapper.decreaseStock(itemId,amount);
+                itemStockDOMapper.decreaseStock(itemId, amount);
                 return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
             }
         });

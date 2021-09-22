@@ -7,11 +7,12 @@ jQuery.fn.extend({
             width: '100px',
             height: '100px',
             imgType: ["gif", "jpeg", "jpg", "bmp", "png"],
-            callback: function () {}
+            callback: function () {
+            }
         }, opts || {});
         $("#" + opts.id).css({
-			'width': opts.width,
-			'height': opts.height
+            'width': opts.width,
+            'height': opts.height
         });
         _self.getObjectURL = function (file) {
             var url = null;

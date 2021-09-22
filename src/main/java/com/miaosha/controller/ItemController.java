@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 @Controller("item")
 @RequestMapping("/item")
 @CrossOrigin(allowCredentials = "true", allowedHeaders = "*") //实现ajax跨域请求
-public class ItemController extends BaseController{
+public class ItemController extends BaseController {
 
     @Autowired
     private ItemService itemService;
@@ -37,7 +37,7 @@ public class ItemController extends BaseController{
     private PromoService promoService;
 
     //创建商品的controller
-    @RequestMapping(value = "/create",method = {RequestMethod.POST},consumes = {CONTENT_TYPE_FORMED})
+    @RequestMapping(value = "/create", method = {RequestMethod.POST}, consumes = {CONTENT_TYPE_FORMED})
     @ResponseBody
     public CommonReturnType creatItem(@RequestParam(name = "title") String title,
                                       @RequestParam(name = "description") String description,
@@ -59,27 +59,27 @@ public class ItemController extends BaseController{
     }
 
     //商品详情页面
-    @RequestMapping(value = "/get",method = {RequestMethod.GET})
+    @RequestMapping(value = "/get", method = {RequestMethod.GET})
     @ResponseBody
-    public CommonReturnType getItem(@RequestParam(name = "id") Integer id){
+    public CommonReturnType getItem(@RequestParam(name = "id") Integer id) {
         ItemModel itemModel = null;
 
         //先取本地缓存
-        itemModel= (ItemModel) cacheService.getFromCommonCache("item_"+id);
+        itemModel = (ItemModel) cacheService.getFromCommonCache("item_" + id);
 
-        if (itemModel == null){//若本地缓存不存在
+        if (itemModel == null) {//若本地缓存不存在
             //根据商品的id到Redis内获取
-            itemModel = (ItemModel) redisTemplate.opsForValue().get("item_"+id);
+            itemModel = (ItemModel) redisTemplate.opsForValue().get("item_" + id);
 
             //若Redis内不存在对应的itemModel，则访问下游service
-            if(itemModel == null){
+            if (itemModel == null) {
                 itemModel = itemService.getItemById(id);
                 //设置itemModel到Redis内
-                redisTemplate.opsForValue().set("item_"+id,itemModel);
-                redisTemplate.expire("item_"+id,10, TimeUnit.MINUTES);
+                redisTemplate.opsForValue().set("item_" + id, itemModel);
+                redisTemplate.expire("item_" + id, 10, TimeUnit.MINUTES);
             }
             //填充本地缓存
-            cacheService.setCommonCache("item_"+id,itemModel);
+            cacheService.setCommonCache("item_" + id, itemModel);
         }
 
 
@@ -90,7 +90,7 @@ public class ItemController extends BaseController{
         return CommonReturnType.create(itemVO);
     }
 
-    @RequestMapping(value = "/publishpromo",method = {RequestMethod.GET})
+    @RequestMapping(value = "/publishpromo", method = {RequestMethod.GET})
     @ResponseBody
     public CommonReturnType publishPromo(@RequestParam(name = "id") Integer id) {
         promoService.publishPromo(id);
@@ -99,9 +99,9 @@ public class ItemController extends BaseController{
 
 
     //商品列表页面浏览
-    @RequestMapping(value = "/list",method = {RequestMethod.GET})
+    @RequestMapping(value = "/list", method = {RequestMethod.GET})
     @ResponseBody
-    public CommonReturnType listItem(){
+    public CommonReturnType listItem() {
         List<ItemModel> itemModelList = itemService.listItem();
 
         //使用stream api将list内的itemModel转化为ItemVO
@@ -112,20 +112,20 @@ public class ItemController extends BaseController{
         return CommonReturnType.create(itemVOList);
     }
 
-    private ItemVO convertVOFromModel(ItemModel itemModel){
-        if(itemModel == null){
+    private ItemVO convertVOFromModel(ItemModel itemModel) {
+        if (itemModel == null) {
             return null;
         }
         ItemVO itemVO = new ItemVO();
-        BeanUtils.copyProperties(itemModel,itemVO);
-        if (itemModel.getPromoModel() != null){
+        BeanUtils.copyProperties(itemModel, itemVO);
+        if (itemModel.getPromoModel() != null) {
             //有正在进行或即将进行的秒杀活动
             itemVO.setPromoStatus(itemModel.getPromoModel().getStatus());
             itemVO.setPromoId(itemModel.getPromoModel().getId());
             itemVO.setStartDate(itemModel.getPromoModel().getStartDate()
                     .toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")));
             itemVO.setPromoPrice(itemModel.getPromoModel().getPromoItemPrice());
-        }else {
+        } else {
             itemVO.setPromoStatus(0);
         }
         return itemVO;

@@ -11,15 +11,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Hello world!
- *
  */
 
 
 @SpringBootApplication(scanBasePackages = {"com.miaosha"})
 @MapperScan("com.miaosha.dao")
 @RestController
-public class App
-{
+public class App {
     @Autowired
     private UserDOMapper userDOMapper;
 
@@ -34,7 +32,8 @@ public class App
             return userDO.getName();
         }
     }
-    public static void main( String[] args ) {
+
+    public static void main(String[] args) {
         SpringApplication.run(App.class, args);
     }
 }

@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
 @CrossOrigin(allowCredentials = "true", allowedHeaders = "*")//实现ajax跨域请求
 @Controller("user")
 @RequestMapping("/user")
-public class UserController extends BaseController{
+public class UserController extends BaseController {
 
 
     @Autowired
@@ -42,12 +42,12 @@ public class UserController extends BaseController{
 
 
     //用户登录接口
-    @RequestMapping(value = "/login",method = {RequestMethod.POST},consumes = {CONTENT_TYPE_FORMED})
+    @RequestMapping(value = "/login", method = {RequestMethod.POST}, consumes = {CONTENT_TYPE_FORMED})
     @ResponseBody
     public CommonReturnType login(@RequestParam(name = "telephone") String telephone,
                                   @RequestParam(name = "password") String password) throws BusinessException, UnsupportedEncodingException, NoSuchAlgorithmException {
         //入参校验
-        if(StringUtils.isEmpty(telephone)||StringUtils.isEmpty(password)){
+        if (StringUtils.isEmpty(telephone) || StringUtils.isEmpty(password)) {
             throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR);
         }
 
@@ -60,13 +60,13 @@ public class UserController extends BaseController{
 
         //生成登陆凭证token，UUID
         String uuidToken = UUID.randomUUID().toString();
-        uuidToken = uuidToken.replace("-","");
+        uuidToken = uuidToken.replace("-", "");
         //建立token和用户登录态之间的联系
-        redisTemplate.opsForValue().set(uuidToken,userModel);
-        redisTemplate.expire(uuidToken,1, TimeUnit.HOURS);
+        redisTemplate.opsForValue().set(uuidToken, userModel);
+        redisTemplate.expire(uuidToken, 1, TimeUnit.HOURS);
 
-        this.httpServletRequest.getSession().setAttribute("IS_LOGIN",true);
-        this.httpServletRequest.getSession().setAttribute("LOGIN_USER",userModel);
+        this.httpServletRequest.getSession().setAttribute("IS_LOGIN", true);
+        this.httpServletRequest.getSession().setAttribute("LOGIN_USER", userModel);
 
         //下发了token
         return CommonReturnType.create(uuidToken);
@@ -84,8 +84,8 @@ public class UserController extends BaseController{
                                      @RequestParam(name = "age") Integer age) throws BusinessException, UnsupportedEncodingException, NoSuchAlgorithmException {
         //验证手机号和对应的otpCode相符合
         String inSessionOtpCode = (String) this.httpServletRequest.getSession().getAttribute(telephone);
-        if(!com.alibaba.druid.util.StringUtils.equals(otpCode,inSessionOtpCode)){
-            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR,"短信验证码不正确");
+        if (!com.alibaba.druid.util.StringUtils.equals(otpCode, inSessionOtpCode)) {
+            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR, "短信验证码不正确");
         }
         //用户的注册流程
         UserModel userModel = new UserModel();
@@ -111,21 +111,21 @@ public class UserController extends BaseController{
         return newStr;
     }
 
-    @RequestMapping(value = "/getotp",method = {RequestMethod.POST},consumes = {CONTENT_TYPE_FORMED})
+    @RequestMapping(value = "/getotp", method = {RequestMethod.POST}, consumes = {CONTENT_TYPE_FORMED})
     @ResponseBody
-    public CommonReturnType getOtp(@RequestParam(name = "telephone") String telephone){
+    public CommonReturnType getOtp(@RequestParam(name = "telephone") String telephone) {
         //需要按照一定的规则生成OTP验证码
         Random random = new Random();
         int randomInt = random.nextInt(99999); //取值[0,99999]
-        randomInt+=10000;
+        randomInt += 10000;
 
-        String optCode=String.valueOf(randomInt);
+        String optCode = String.valueOf(randomInt);
 
         //将OTP验证码同对应用户的手机号关联，使用http
-        httpServletRequest.getSession().setAttribute(telephone,optCode);
+        httpServletRequest.getSession().setAttribute(telephone, optCode);
 
         //将OTP验证码通过短信通道发送给用户，省略
-        System.out.println("telephone = "+telephone+" & otpCode = "+optCode);
+        System.out.println("telephone = " + telephone + " & otpCode = " + optCode);
 
         return CommonReturnType.create(null);
     }

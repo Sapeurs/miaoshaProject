@@ -31,7 +31,7 @@ import java.util.concurrent.*;
 @Controller("/order")
 @RequestMapping("/order")
 @CrossOrigin(allowCredentials = "true", allowedHeaders = "*") //实现ajax跨域请求
-public class OrderController extends BaseController{
+public class OrderController extends BaseController {
 
     @Autowired
     private OrderService orderService;
@@ -58,70 +58,70 @@ public class OrderController extends BaseController{
     //@PostConstruct注解的方法在项目启动的时候执行这个方法，
     // 也可以理解为在spring容器启动的时候执行，可作为一些数据的常规化加载
     @PostConstruct
-    public void init(){
+    public void init() {
         executorService = Executors.newFixedThreadPool(20);
 
         orderCreateRateLimiter = RateLimiter.create(100);
     }
 
     //生成验证码
-    @RequestMapping(value = "/generateverifycode",method = {RequestMethod.POST,RequestMethod.GET})
+    @RequestMapping(value = "/generateverifycode", method = {RequestMethod.POST, RequestMethod.GET})
     @ResponseBody
     public void generateverifyCode(HttpServletResponse response) throws BusinessException, IOException {
         String token = httpServletRequest.getParameterMap().get("token")[0];
 
-        if (StringUtils.isEmpty(token)){
-            throw new BusinessException(EmBusinessError.USER_NOT_LOGIN,"用户还未登录,不能生成验证码");
+        if (StringUtils.isEmpty(token)) {
+            throw new BusinessException(EmBusinessError.USER_NOT_LOGIN, "用户还未登录,不能生成验证码");
         }
 
         UserModel userModel = (UserModel) redisTemplate.opsForValue().get(token);
-        if (userModel == null){
-            throw new BusinessException(EmBusinessError.USER_NOT_LOGIN,"用户还未登录,不能生成验证码");
+        if (userModel == null) {
+            throw new BusinessException(EmBusinessError.USER_NOT_LOGIN, "用户还未登录,不能生成验证码");
         }
 
-        Map<String,Object> map = CodeUtil.generateCodeAndPic();
+        Map<String, Object> map = CodeUtil.generateCodeAndPic();
 
-        redisTemplate.opsForValue().set("verify_code_"+userModel.getId(),map.get("code"));
-        redisTemplate.expire("verify_code_"+userModel.getId(),5,TimeUnit.MINUTES);
+        redisTemplate.opsForValue().set("verify_code_" + userModel.getId(), map.get("code"));
+        redisTemplate.expire("verify_code_" + userModel.getId(), 5, TimeUnit.MINUTES);
         ImageIO.write((RenderedImage) map.get("codePic"), "jpeg", response.getOutputStream());
 
     }
 
 
     //生成秒杀令牌
-    @RequestMapping(value = "/generatetoken",method = {RequestMethod.POST},consumes = {CONTENT_TYPE_FORMED})
+    @RequestMapping(value = "/generatetoken", method = {RequestMethod.POST}, consumes = {CONTENT_TYPE_FORMED})
     @ResponseBody
     public CommonReturnType gerneratetoken(@RequestParam(name = "itemId") Integer itemId,
-                                        @RequestParam(name = "promoId") Integer promoId,
-                                           @RequestParam(name = "verifyCode")String verifyCode) throws BusinessException {
+                                           @RequestParam(name = "promoId") Integer promoId,
+                                           @RequestParam(name = "verifyCode") String verifyCode) throws BusinessException {
         //根据token获取用户信息
         String token = httpServletRequest.getParameterMap().get("token")[0];
 
-        if (StringUtils.isEmpty(token)){
-            throw new BusinessException(EmBusinessError.USER_NOT_LOGIN,"用户还未登录,不能下单");
+        if (StringUtils.isEmpty(token)) {
+            throw new BusinessException(EmBusinessError.USER_NOT_LOGIN, "用户还未登录,不能下单");
         }
 
         UserModel userModel = (UserModel) redisTemplate.opsForValue().get(token);
-        if (userModel == null){
-            throw new BusinessException(EmBusinessError.USER_NOT_LOGIN,"用户还未登录,不能下单");
+        if (userModel == null) {
+            throw new BusinessException(EmBusinessError.USER_NOT_LOGIN, "用户还未登录,不能下单");
         }
 
 
         //通过verifycode验证验证码的有效性
         String redisVerifyCode = (String) redisTemplate.opsForValue().get("verify_code_" + userModel.getId());
         System.out.println(redisVerifyCode);
-        if (StringUtils.isEmpty(redisVerifyCode)){
-            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR,"请求非法");
+        if (StringUtils.isEmpty(redisVerifyCode)) {
+            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR, "请求非法");
         }
-        if (!redisVerifyCode.equalsIgnoreCase(verifyCode)){
-            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR,"验证码错误");
+        if (!redisVerifyCode.equalsIgnoreCase(verifyCode)) {
+            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR, "验证码错误");
         }
 
         //获取秒杀访问令牌
         String promoToken = promoService.generateSecondKillToken(promoId, itemId, userModel.getId());
 
-        if (promoToken == null){
-            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR,"生成令牌失败");
+        if (promoToken == null) {
+            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR, "生成令牌失败");
         }
 
         //返回对应的结果
@@ -130,47 +130,48 @@ public class OrderController extends BaseController{
     }
 
     /**
-     *  封装下单请求
+     * 封装下单请求
+     *
      * @param itemId
-     * @param amount 下单数量
+     * @param amount     下单数量
      * @param promoId
      * @param promoToken 秒杀令牌
      * @return
      * @throws BusinessException
      */
-    @RequestMapping(value = "/createorder",method = {RequestMethod.POST},consumes = {CONTENT_TYPE_FORMED})
+    @RequestMapping(value = "/createorder", method = {RequestMethod.POST}, consumes = {CONTENT_TYPE_FORMED})
     @ResponseBody
     public CommonReturnType createOrder(@RequestParam(name = "itemId") Integer itemId,
                                         @RequestParam(name = "amount") Integer amount,
-                                        @RequestParam(name = "promoId",required = false) Integer promoId,
-                                        @RequestParam(name = "promoToken",required = false) String promoToken)
-                                        throws BusinessException {
+                                        @RequestParam(name = "promoId", required = false) Integer promoId,
+                                        @RequestParam(name = "promoToken", required = false) String promoToken)
+            throws BusinessException {
 
         //限流，先获取令牌，如果失败，返回错误
-        if (!orderCreateRateLimiter.tryAcquire()){
+        if (!orderCreateRateLimiter.tryAcquire()) {
             throw new BusinessException(EmBusinessError.RATE_LIMIT);
         }
 
         String token = httpServletRequest.getParameterMap().get("token")[0];
 
-        if (StringUtils.isEmpty(token)){
-            throw new BusinessException(EmBusinessError.USER_NOT_LOGIN,"用户还未登录,不能下单");
+        if (StringUtils.isEmpty(token)) {
+            throw new BusinessException(EmBusinessError.USER_NOT_LOGIN, "用户还未登录,不能下单");
         }
 
         UserModel userModel = (UserModel) redisTemplate.opsForValue().get(token);
-        if (userModel == null){
-            throw new BusinessException(EmBusinessError.USER_NOT_LOGIN,"用户还未登录,不能下单");
+        if (userModel == null) {
+            throw new BusinessException(EmBusinessError.USER_NOT_LOGIN, "用户还未登录,不能下单");
         }
 
         //校验秒杀令牌是否正确
-        if (promoId != null){
-            String inRedisPromoToken = (String) redisTemplate.opsForValue().get("promo_token_"+promoId+"_userid_"+userModel.getId()+"_itemid_"+itemId);
+        if (promoId != null) {
+            String inRedisPromoToken = (String) redisTemplate.opsForValue().get("promo_token_" + promoId + "_userid_" + userModel.getId() + "_itemid_" + itemId);
 
-            if (inRedisPromoToken == null){
-                throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR,"秒杀令牌校验失败");
+            if (inRedisPromoToken == null) {
+                throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR, "秒杀令牌校验失败");
             }
-            if (!StringUtils.equals(promoToken,inRedisPromoToken)){
-                throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR,"秒杀令牌校验失败");
+            if (!StringUtils.equals(promoToken, inRedisPromoToken)) {
+                throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR, "秒杀令牌校验失败");
             }
         }
 
