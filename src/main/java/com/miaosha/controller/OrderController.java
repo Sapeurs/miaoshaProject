@@ -147,7 +147,7 @@ public class OrderController extends BaseController {
                                         @RequestParam(name = "promoToken", required = false) String promoToken)
             throws BusinessException {
 
-        //限流，先获取令牌，如果失败，返回错误
+        //限流，先从令牌桶中获取令牌，如果失败，返回错误
         if (!orderCreateRateLimiter.tryAcquire()) {
             throw new BusinessException(EmBusinessError.RATE_LIMIT);
         }

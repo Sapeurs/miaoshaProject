@@ -124,7 +124,7 @@ public class MqProducer {
                 JSON.toJSON(bodyMap).toString().getBytes(StandardCharsets.UTF_8));
         TransactionSendResult sendResult = null;
         try {
-            //使用transactionMQProducer将消息投递出去，发送的是一条事务型消息
+            //使用transactionMQProducer将消息投递出去，发送的是一条事务型消息  argsMap:与本地事务执行程序一起使用的参数。
             sendResult = transactionMQProducer.sendMessageInTransaction(message, argsMap);
         } catch (MQClientException e) {
             e.printStackTrace();
